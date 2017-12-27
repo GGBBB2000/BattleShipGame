@@ -35,12 +35,13 @@ class Main {
     }
     static void attack(){
             enemyMap[4][4]=1;
-            count(2);
+            count(2);//ここなんかダサい
             count(3);
             count(3);
             count(4);
             count(5);
             printSearchMap();
+            choose();
             check();
     }
     static void deffense(){
@@ -109,6 +110,30 @@ class Main {
                 }
 
             }
+        }
+    }
+    static void choose (){
+        int max = 0;
+        int index = 0;//maxの値をもつ座標の個数
+        int posx[] = new int [100];//配列は通し番号,maxの値を持つ座標を代入
+        int posy[] = new int [100];
+        for (int i=0;i<10;i++){
+            for (int j=0;j<10;j++){
+                if (max==searchMap[j][i]){//maxとおなじなら
+                    posx[index] = j;
+                    posy[index] = i;
+                    index++;
+                } else if (max<searchMap[j][i]){//maxより小さいなら塗り替える
+                    index = 1;
+                    posx[0] = j;
+                    posy[0] = i;
+                    max = searchMap[j][i];
+                }
+            }
+        }
+        System.out.println("BON!!");
+        for(int i=0;i<index;i++){
+            System.out.println("x,y : "+posx[i]+","+posy[i]);
         }
     }
 }
