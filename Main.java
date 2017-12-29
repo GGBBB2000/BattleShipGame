@@ -1,6 +1,6 @@
 import java.util.Scanner;
 class Main {
-    static int order = 0;//先行なら0
+    static int order = 1;//先行なら0
     static int map[][] = new int [10][10];//自分のマップ
     static int enemyMap[][] = new int [10][10];//敵のマップ
     static int searchMap[][] = new int [10][10];//敵を探索するときのマップ
@@ -10,31 +10,38 @@ class Main {
     Fleet Cruiser1 = new Fleet(5,5,1,3);
     Fleet Cruiser2 = new Fleet(6,6,0,3);
     Fleet Destroyer = new Fleet(7,7,0,2);
+    static int hp [] = {5,2,3,3,4,5};//船のIDに合わせて。index0番めは残りの船の数
 
     public static void main (String args[]){
         initialize();
-        if (order==0){
+        if (order==1){
             deffense();
         }
-        do{
-            attack();
-            deffense();
-        }while(judge());
+        
+        for(;;){
+            if (!attack()){
+                return;
+            }
+            if(!deffense()){
+                return;
+            }
+        }
     }
 
     static void initialize(){
-        put(2,2,0,5);//空母
-        put(4,4,0,4);//戦艦
-        put(5,5,1,3);//巡洋艦1
-        put(6,6,0,3);//巡洋艦2
-        put(7,7,0,2);//駆逐艦
+        put(2,2,0,5,5);//空母のIDは5
+        put(4,4,0,4,4);//戦艦のIDは4
+        put(5,5,1,3,3);//巡洋艦1のIDは3
+        put(6,6,0,3,2);//巡洋艦2のIDは2
+        put(7,7,0,2,1);//駆逐艦のIDは1
         printMap();
     }
     static boolean judge(){
         return false;
     }
-    static void attack(){
+    static boolean attack(){
             enemyMap[4][4]=1;
+            countClear();
             count(2);//ここなんかダサい
             count(3);
             count(3);
@@ -42,21 +49,45 @@ class Main {
             count(5);
             printSearchMap();
             choose();
-            check();
+            return true;
     }
-    static void deffense(){
-            check();
+    static boolean deffense(){
+        boolean boo = true;
+        System.out.println("敵の攻撃\nスペース区切りで座標を入力\n左上は1,1");
+        Scanner sc = new Scanner(System.in);
+        int x = sc.nextInt();
+        int y = sc.nextInt();
+        if (map[x][y]>0){
+            int i = map[x][y];
+            map[x][y]=0;
+            //map[x][y]*=-1;//こっちやったら書式崩れたので
+            hp[i]--;
+            if (hp[i]==0){
+                System.out.println("撃沈");
+                hp[0]--;
+                if (hp[0]==0){
+                    System.out.println("負け");
+                    boo = false;
+                }
+            }else {
+                System.out.println("Hit!!");
+            }
+        }else{
+            System.out.println("ハズレ");
+        }
+        printMap();
+        return boo;
     }
     static void check(){
         
     }
-    static void put(int x,int y,int dir,int length){
+    static void put(int x,int y,int dir,int length,int shipType){
         for(int i =0;i<length;i++){//長さの分だけ置く
             if (dir==0){//横向きに置く
-                map[x+i][y]=1;
+                map[x+i][y]=shipType;
             }
             if (dir==1){//縦向きに置く
-                map[x][y+i]=1;
+                map[x][y+i]=shipType;
             }
         }
     }
@@ -82,6 +113,7 @@ class Main {
         }
         System.out.println("");
     }
+
     static void count(int length){//置くことができる個数を調べるメソッド
         for(int i=0;i+length<=10;i++){//横向きで置くことを考える。ただしはみ出さないようにする
             for (int j=0;j<10;j++){
@@ -116,6 +148,13 @@ class Main {
             }
         }
     }
+    static void countClear(){
+        for(int i=0;i<10;i++){
+            for(int j=0;j<10;j++){
+                searchMap[i][j]=0;
+            }
+        }
+    }
     static void choose (){
         int max = 0;
         int index = 0;//maxの値をもつ座標の個数
@@ -135,9 +174,11 @@ class Main {
                 }
             }
         }
-        System.out.println("BON!!");
+        System.out.println("候補一覧");
         for(int i=0;i<index;i++){
-            System.out.println("x,y : "+posx[i]+","+posy[i]);
-        }
+            System.out.println("x,y : "+posx[i]+","+posy[i]);//候補一覧\nアイデア募集
+        }//そもそも候補が複数になることって最初以外あるの？
+        System.out.println("BON!!");
+        System.out.println(""+posx[0]+","+posy[0]);//とりあえず最初の
     }
 }
