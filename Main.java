@@ -63,7 +63,11 @@ class Main {
     static void printMap(){//自分のマップ表示
         for(int i= 0;i<10;i++){
             for (int j=0;j<10;j++){
-                System.out.print(""+map[j][i]+" ");
+                if(map[j][i] == 0){
+                    System.out.print("[ ]");
+                }else{
+                    System.out.print("["+map[j][i]+"]");
+                }
             }
             System.out.println("");
         }
@@ -72,7 +76,7 @@ class Main {
     static void printSearchMap(){//敵の探索用のマップ表示
         for(int i= 0;i<10;i++){
             for (int j=0;j<10;j++){
-                System.out.print(""+searchMap[j][i]+" ");
+                System.out.print(String.format("%2d ",searchMap[j][i]));
             }
             System.out.println("");
         }
