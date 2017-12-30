@@ -18,7 +18,7 @@ class Main {
             deffense();
         }
         
-        for(;;){
+        while(true){
             if (!attack()){
                 return;
             }
@@ -55,8 +55,9 @@ class Main {
         boolean boo = true;
         System.out.println("敵の攻撃\nスペース区切りで座標を入力\n左上は1,1");
         Scanner sc = new Scanner(System.in);
-        int x = sc.nextInt();
-        int y = sc.nextInt();
+        int x = sc.nextInt()-1;
+        int y = sc.nextInt()-1;
+        System.out.println("x,y"+x+","+y);
         if (map[x][y]>0){
             int i = map[x][y];
             map[x][y]=0;
@@ -92,7 +93,13 @@ class Main {
         }
     }
     static void printMap(){//自分のマップ表示
+        System.out.println("printMap");
+        System.out.print("   ");
+        for(int x = 1;x < 11 ;x++)
+            System.out.print(x +"  ");
+        System.out.println("");
         for(int i= 0;i<10;i++){
+            System.out.print(String.format("%2d",i+1));
             for (int j=0;j<10;j++){
                 if(map[j][i] == 0){
                     System.out.print("[ ]");
@@ -105,6 +112,7 @@ class Main {
         System.out.println("");
     }
     static void printSearchMap(){//敵の探索用のマップ表示
+        System.out.println("printSearchMap");
         for(int i= 0;i<10;i++){
             for (int j=0;j<10;j++){
                 System.out.print(String.format("%2d ",searchMap[j][i]));
@@ -176,9 +184,9 @@ class Main {
         }
         System.out.println("候補一覧");
         for(int i=0;i<index;i++){
-            System.out.println("x,y : "+posx[i]+","+posy[i]);//候補一覧\nアイデア募集
+            System.out.println("x,y : "+(posx[i]+1)+","+(posy[i]+1));//候補一覧\nアイデア募集
         }//そもそも候補が複数になることって最初以外あるの？
         System.out.println("BON!!");
-        System.out.println(""+posx[0]+","+posy[0]);//とりあえず最初の
+        System.out.println(""+(posx[0]+1)+","+(posy[0]+1));//とりあえず最初の
     }
 }
