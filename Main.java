@@ -18,7 +18,7 @@ class Main {
             deffense();
         }
         
-        for(;;){
+        while(true){
             if (!attack()){
                 return;
             }
@@ -55,8 +55,8 @@ class Main {
         boolean boo = true;
         System.out.println("敵の攻撃\nスペース区切りで座標を入力\n左上は1,1");
         Scanner sc = new Scanner(System.in);
-        int x = sc.nextInt();
-        int y = sc.nextInt();
+        int x = sc.nextInt()+1;
+        int y = sc.nextInt()+1;
         if (map[x][y]>0){
             int i = map[x][y];
             map[x][y]=0;
@@ -92,7 +92,12 @@ class Main {
         }
     }
     static void printMap(){//自分のマップ表示
+        System.out.print("   ");
+        for(int x = 1;x < 11 ;x++)
+            System.out.print(x +"  ");
+        System.out.println("");
         for(int i= 0;i<10;i++){
+            System.out.print(String.format("%2d",i+1));
             for (int j=0;j<10;j++){
                 if(map[j][i] == 0){
                     System.out.print("[ ]");
