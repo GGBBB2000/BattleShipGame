@@ -4,7 +4,7 @@ class Main {
     static int map[][] = new int [10][10];//自分のマップ
     static int enemyMap[][] = new int [10][10];//敵のマップ
     static int searchMap[][] = new int [10][10];//敵を探索するときのマップ
-    //static int mode = 0;
+    static int mode = 0;
     Fleet CV = new Fleet(2,2,0,5);//船の場所を自動生成するメソッドを作るまではこれで行く
     Fleet BattleShip = new Fleet(4,4,0,4);//もしかしたらこんなのいらないかもしれない
     Fleet Cruiser1 = new Fleet(5,5,1,3);
@@ -17,7 +17,7 @@ class Main {
         if (order==1){
             deffense();
         }
-        
+
         while(true){
             if (!attack()){
                 return;
@@ -36,28 +36,30 @@ class Main {
         put(7,7,0,2,1);//駆逐艦のIDは1
         printMap();
     }
-    static boolean judge(){
-        return false;
-    }
     static boolean attack(){
-            enemyMap[4][4]=1;
-            countClear();
-            count(2);//ここなんかダサい
-            count(3);
-            count(3);
-            count(4);
-            count(5);
-            printSearchMap();
-            choose();
-            return true;
+        //一回目の攻撃
+        countClear();
+        count(2);//ここなんかダサい
+        count(3);
+        count(3);
+        count(4);
+        count(5);
+        //enemyMap[4][4]=1;
+        printSearchMap();
+        while (hunt()){
+
+        }
+        return choose();
     }
+   static boolean hunt(){
+        return false;
+   }
     static boolean deffense(){
         boolean boo = true;
         System.out.println("敵の攻撃\nスペース区切りで座標を入力\n左上は1,1");
         Scanner sc = new Scanner(System.in);
         int x = sc.nextInt()-1;
         int y = sc.nextInt()-1;
-        System.out.println("x,y"+x+","+y);
         if (map[x][y]>0){
             int i = map[x][y];
             map[x][y]=0;
@@ -78,9 +80,6 @@ class Main {
         }
         printMap();
         return boo;
-    }
-    static void check(){
-        
     }
     static void put(int x,int y,int dir,int length,int shipType){
         for(int i =0;i<length;i++){//長さの分だけ置く
@@ -156,6 +155,7 @@ class Main {
             }
         }
     }
+        
     static void countClear(){
         for(int i=0;i<10;i++){
             for(int j=0;j<10;j++){
@@ -163,7 +163,7 @@ class Main {
             }
         }
     }
-    static void choose (){
+    static boolean choose (){
         int max = 0;
         int index = 0;//maxの値をもつ座標の個数
         int posx[] = new int [100];//配列は通し番号,maxの値を持つ座標を代入
@@ -186,7 +186,24 @@ class Main {
         for(int i=0;i<index;i++){
             System.out.println("x,y : "+(posx[i]+1)+","+(posy[i]+1));//候補一覧\nアイデア募集
         }//そもそも候補が複数になることって最初以外あるの？
-        System.out.println("BON!!");
         System.out.println(""+(posx[0]+1)+","+(posy[0]+1));//とりあえず最初の
+        if (check()){
+            System.out.println("Hit!");
+            enemyMap[posx[0]][posy[0]]=-1;//あたったら-1を書き込み
+            return true;
+        }else{
+            System.out.println("はずれ");
+            enemyMap[posx[0]][posy[0]]=-2;//外れたら-2を書き込み
+            return false;
+        }
+    }
+    static boolean check(){
+        System.out.println("あたったら0,外れたら1");
+        Scanner sc = new Scanner(System.in);
+        if (sc.nextInt()==0){
+            return true;
+        }else{
+            return false;
+        }
     }
 }
