@@ -12,6 +12,12 @@ class Main {
     static int shootx = 0;
     static int shooty = 0;
     static Random rnd = new Random();
+    static int right= 0;
+    static int up= 0;
+    static int left= 0;
+    static int down= 0;
+    static int totalHorizontal = 0;
+    static int totalVertical = 0;
     Fleet CV = new Fleet(2,2,0,5);//船の場所を自動生成するメソッドを作るまではこれで行く
     Fleet BattleShip = new Fleet(4,4,0,4);//もしかしたらこんなのいらないかもしれない
     Fleet Cruiser1 = new Fleet(5,5,1,3);
@@ -57,8 +63,15 @@ class Main {
         printSearchMap();
         choose();
         //enemyMap[4][4]=1;
-        while (hunt(shootx,shooty)){
-            
+        right = 0;
+        left = 0;
+        up = 0;
+        down = 0;
+        totalHorizontal = 0;
+        totalVertical = 0;
+
+        while(hunt(shootx,shooty)){
+            System.out.println("huntcalled");
         }
         return boo;
     }
@@ -180,79 +193,155 @@ class Main {
             }
         }
     }
-   static boolean hunt(int x,int y){
-       int right= 0;
-       int up= 0;
-       int left= 0;
-       int down= 0;
-       int totalHorizontal = 0;
-       int totalVertical = 0;
+    static boolean hunt(int x,int y){
         if(dir == 0){
-                for(int i=1;i-1<maxLength;i++){
-                    if(x-i>=0&&enemyMap[x-i][y]==0){
-                        left++;
-                    }else if (x-i>=0&&enemyMap[x-i][y]!=0){
-                        break;
-                    }
+            for(int i=1;i-1<maxLength;i++){
+                if(x-i>=0&&enemyMap[x-i][y]==0){
+                    left++;
+                }else if (x-i>=0&&enemyMap[x-i][y]!=0){
+                    break;
                 }
-                for(int i=1;i<maxLength+1;i++){
-                    if(x+i<=9&&enemyMap[x+i][y]==0){
-                        right++;
-                    }else if (x+i<=9&&enemyMap[x+i][y]!=0){
-                        break;
-                    }
-                }
-                for(int i=1;i<maxLength+1;i++){
-                    if(y-i>=0&&enemyMap[x][y-i]==0){
-                        up++;
-                    }else if (y-i>=0&&enemyMap[x][y-i]!=0){
-                        break;
-                    }
-                }
-                for(int i=1;i<maxLength+1;i++){
-                    if(y+i<=9&&enemyMap[x][y+i]==0){
-                        down++;
-                    }else if (y+i<=9&&enemyMap[x][y+i]!=0){
-                        break;
-                    }
-                }
-                totalHorizontal = right+left;
-                totalVertical = up+down;
-                System.out.println("H,V"+totalHorizontal+","+totalVertical);
-                if (totalHorizontal<=totalVertical){
-                    if (up>=down){
-                        shootx = x;
-                        shooty = y-1;
-                    }else{
-                        shootx = x;
-                        shooty = y+1;
-                    }
-                }else{
-                    if (left>=right){
-                        shootx = x-1;
-                        shooty = y;
-                    }else{
-                        shootx = x+1;
-                        shooty = y;
-                    }
-
-                } 
-                System.out.println("shoot x,y :"+(shootx+1)+","+(shooty+1));
-                if(check()){
-                    enemyMap[shootx][shooty]=-1;
-                    System.out.println("Hit!!");
-                    printEnemyMap();
-                    hunt(shootx,shooty);
-                }else{
-                    enemyMap[shootx][shooty]=-2;
-                    System.out.println("はずれ");
-                    printEnemyMap();
-                }
-                
             }
-       return false;
-   }
+            for(int i=1;i<maxLength+1;i++){
+                if(x+i<=9&&enemyMap[x+i][y]==0){
+                    right++;
+                }else if (x+i<=9&&enemyMap[x+i][y]!=0){
+                    break;
+                }
+            }
+            for(int i=1;i<maxLength+1;i++){
+                if(y-i>=0&&enemyMap[x][y-i]==0){
+                    up++;
+                }else if (y-i>=0&&enemyMap[x][y-i]!=0){
+                    break;
+                }
+            }
+            for(int i=1;i<maxLength+1;i++){
+                if(y+i<=9&&enemyMap[x][y+i]==0){
+                    down++;
+                }else if (y+i<=9&&enemyMap[x][y+i]!=0){
+                    break;
+                }
+            }
+            totalHorizontal = right+left;
+            totalVertical = up+down;
+            System.out.println("H,V"+totalHorizontal+","+totalVertical);
+            if (totalHorizontal<=totalVertical){
+                if (up>=down){
+                    shootx = x;
+                    shooty = y-1;
+                    up--;
+                    dir = 1;
+                }else{
+                    shootx = x;
+                    shooty = y+1;
+                    down--;
+                    dir = 1;
+                }
+            }else{
+                if (left>=right){
+                    shootx = x-1;
+                    shooty = y;
+                    left--;
+                    dir = 2;
+                }else{
+                    shootx = x+1;
+                    shooty = y;
+                    right--;
+                    dir = 2;
+                }
+            }
+            System.out.println("shoot x,y :"+(shootx+1)+","+(shooty+1));
+            if(check()){
+                enemyMap[shootx][shooty]=-1;
+                System.out.println("Hit!!");
+                printEnemyMap();
+                return true;
+            }else{
+                enemyMap[shootx][shooty]=-2;
+                System.out.println("はずれ");
+                dir = 0;
+                printEnemyMap();
+                return false;
+            }
+        }else if(dir==1){
+            System.out.println("dir1");
+            if (up<=down){
+                down--;
+                for (int i=1;i<10;i++){
+                    if(y+i<=9&&enemyMap[x][y+i]==0){
+                        shootx = x;
+                        shooty = y+i;
+                        break;
+                    }else if(y+i<=9&&enemyMap[x][y+i]!=-1){
+                        break;
+                    }
+                }
+            }else{
+                up--;
+                for (int i=1;i<10;i++){
+                    if(y-i>=0&&enemyMap[x][y-i]==0){
+                        shootx= x;
+                        shooty= y-i;
+                        break;
+                    }else if(y-i>=0&&enemyMap[x][y-i]!=-1){
+                        break;
+                    }
+                } 
+            }
+            System.out.println("shoot x,y : "+(shootx+1)+","+(shooty+1));
+            if (check()){
+                System.out.println("Hit!");
+                enemyMap[shootx][shooty]=-1;//あたったら-1を書き込み
+                printEnemyMap();
+                return true;
+            }else{
+                System.out.println("はずれ");
+                enemyMap[shootx][shooty]=-2;//外れたら-2を書き込み
+                printEnemyMap();
+                return false;
+            }
         
+        }else{
+            System.out.println("dir2");
+            if (right>=left){
+                right--;
+                for (int i=1;i<10;i++){
+                    if(x+i<=9&&enemyMap[x+i][y]==0){
+                        shootx = x+i;
+                        shooty = y;
+                        break;
+                    }else if(x+i<=9&&enemyMap[x+i][y]!=-1){
+                        break;
+                    }
+                }
+            }else{
+                left--;
+                for (int i=1;i<10;i++){
+                    if(x-i>=0&&enemyMap[x-i][y]==0){
+                        shootx= x-i;
+                        shooty= y;
+                        break;
+                    }else if(x-i>=0&&enemyMap[x-i][y]!=-1){
+                        break;
+                    }
+                } 
+            }
+            System.out.println("shoot x,y : "+(shootx+1)+","+(shooty+1));
+            if (check()){
+                System.out.println("Hit!");
+                enemyMap[shootx][shooty]=-1;//あたったら-1を書き込み
+                printEnemyMap();
+                return true;
+            }else{
+                System.out.println("はずれ");
+                enemyMap[shootx][shooty]=-2;//外れたら-2を書き込み
+                printEnemyMap();
+                return false;
+            }
+        }
+    }
+
     static void countClear(){
         for(int i=0;i<10;i++){
             for(int j=0;j<10;j++){
