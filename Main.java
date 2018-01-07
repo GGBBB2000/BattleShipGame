@@ -49,7 +49,10 @@ class Main {
         while (hunt()){
 
         }
-        return choose();
+        if( choose()){
+            attack();
+        }
+        return true;
     }
    static boolean hunt(){
         return false;
@@ -92,7 +95,7 @@ class Main {
         }
     }
     static void printMap(){//自分のマップ表示
-        System.out.println("printMap");
+        System.out.println("printMap"+"\u001b[34m");
         System.out.print("   ");
         for(int x = 1;x < 11 ;x++)
             System.out.print(x +"  ");
@@ -108,17 +111,17 @@ class Main {
             }
             System.out.println("");
         }
-        System.out.println("");
+        System.out.println("\u001b[0m");
     }
     static void printSearchMap(){//敵の探索用のマップ表示
-        System.out.println("printSearchMap");
+        System.out.println("printSearchMap"+"\u001b[31m");
         for(int i= 0;i<10;i++){
             for (int j=0;j<10;j++){
                 System.out.print(String.format("%2d ",searchMap[j][i]));
             }
             System.out.println("");
         }
-        System.out.println("");
+        System.out.println("\u001b[0m");
     }
 
     static void count(int length){//置くことができる個数を調べるメソッド
