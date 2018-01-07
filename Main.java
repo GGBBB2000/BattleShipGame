@@ -1,10 +1,17 @@
 import java.util.Scanner;
+import java.util.Random;
 class Main {
     static int order = 1;//先行なら0
     static int map[][] = new int [10][10];//自分のマップ
     static int enemyMap[][] = new int [10][10];//敵のマップ
     static int searchMap[][] = new int [10][10];//敵を探索するときのマップ
     static int mode = 0;
+    static int dir = 0;//0なら探索中,1なら横,2なら縦
+    static int maxLength = 5;
+    static int minLength = 2;
+    static int shootx = 0;
+    static int shooty = 0;
+    static Random rnd = new Random();
     Fleet CV = new Fleet(2,2,0,5);//船の場所を自動生成するメソッドを作るまではこれで行く
     Fleet BattleShip = new Fleet(4,4,0,4);//もしかしたらこんなのいらないかもしれない
     Fleet Cruiser1 = new Fleet(5,5,1,3);
@@ -22,6 +29,7 @@ class Main {
             if (!attack()){
                 return;
             }
+            mode =0;
             if(!deffense()){
                 return;
             }
@@ -29,6 +37,7 @@ class Main {
     }
 
     static void initialize(){
+        enemyClear();
         put(2,2,0,5,5);//空母のIDは5
         put(4,4,0,4,4);//戦艦のIDは4
         put(5,5,1,3,3);//巡洋艦1のIDは3
@@ -37,6 +46,7 @@ class Main {
         printMap();
     }
     static boolean attack(){
+        boolean boo = true;
         //一回目の攻撃
         countClear();
         count(2);//ここなんかダサい
@@ -44,19 +54,14 @@ class Main {
         count(3);
         count(4);
         count(5);
-        //enemyMap[4][4]=1;
         printSearchMap();
-        while (hunt()){
-
+        choose();
+        //enemyMap[4][4]=1;
+        while (hunt(shootx,shooty)){
+            
         }
-        if( choose()){
-            attack();
-        }
-        return true;
+        return boo;
     }
-   static boolean hunt(){
-        return false;
-   }
     static boolean deffense(){
         boolean boo = true;
         System.out.println("敵の攻撃\nスペース区切りで座標を入力\n左上は1,1");
@@ -77,6 +82,7 @@ class Main {
                 }
             }else {
                 System.out.println("Hit!!");
+                deffense();
             }
         }else{
             System.out.println("ハズレ");
@@ -98,15 +104,34 @@ class Main {
         System.out.println("printMap"+"\u001b[34m");
         System.out.print("   ");
         for(int x = 1;x < 11 ;x++)
-            System.out.print(x +"  ");
+            System.out.print(x +"   ");
         System.out.println("");
         for(int i= 0;i<10;i++){
             System.out.print(String.format("%2d",i+1));
             for (int j=0;j<10;j++){
                 if(map[j][i] == 0){
-                    System.out.print("[ ]");
+                    System.out.print("[  ]");
                 }else{
-                    System.out.print("["+map[j][i]+"]");
+                    System.out.print("["+String.format("%2d",map[j][i])+"]");
+                }
+            }
+            System.out.println("");
+        }
+        System.out.println("\u001b[0m");
+    }
+    static void printEnemyMap(){//tekiのマップ表示
+        System.out.println("printEnemyMap"+"\u001b[33m");
+        System.out.print("   ");
+        for(int x = 1;x < 11 ;x++)
+            System.out.print(x +"   ");
+        System.out.println("");
+        for(int i= 0;i<10;i++){
+            System.out.print(String.format("%2d",i+1));
+            for (int j=0;j<10;j++){
+                if(enemyMap[j][i] == 0){
+                    System.out.print("[  ]");
+                }else{
+                    System.out.print("["+String.format("%2d",enemyMap[j][i])+"]");
                 }
             }
             System.out.println("");
@@ -123,7 +148,6 @@ class Main {
         }
         System.out.println("\u001b[0m");
     }
-
     static void count(int length){//置くことができる個数を調べるメソッド
         for(int i=0;i+length<=10;i++){//横向きで置くことを考える。ただしはみ出さないようにする
             for (int j=0;j<10;j++){
@@ -138,7 +162,6 @@ class Main {
                         searchMap[i+k][j]++;
                     }
                 }
-
             }
         }
         for(int i=0;i<10;i++){//縦向き
@@ -154,15 +177,93 @@ class Main {
                         searchMap[i][j+k]++;
                     }
                 }
-
             }
         }
     }
+   static boolean hunt(int x,int y){
+       int right= 0;
+       int up= 0;
+       int left= 0;
+       int down= 0;
+       int totalHorizontal = 0;
+       int totalVertical = 0;
+        if(dir == 0){
+                for(int i=1;i-1<maxLength;i++){
+                    if(x-i>=0&&enemyMap[x-i][y]==0){
+                        left++;
+                    }else if (x-i>=0&&enemyMap[x-i][y]!=0){
+                        break;
+                    }
+                }
+                for(int i=1;i<maxLength+1;i++){
+                    if(x+i<=9&&enemyMap[x+i][y]==0){
+                        right++;
+                    }else if (x+i<=9&&enemyMap[x+i][y]!=0){
+                        break;
+                    }
+                }
+                for(int i=1;i<maxLength+1;i++){
+                    if(y-i>=0&&enemyMap[x][y-i]==0){
+                        up++;
+                    }else if (y-i>=0&&enemyMap[x][y-i]!=0){
+                        break;
+                    }
+                }
+                for(int i=1;i<maxLength+1;i++){
+                    if(y+i<=9&&enemyMap[x][y+i]==0){
+                        down++;
+                    }else if (y+i<=9&&enemyMap[x][y+i]!=0){
+                        break;
+                    }
+                }
+                totalHorizontal = right+left;
+                totalVertical = up+down;
+                System.out.println("H,V"+totalHorizontal+","+totalVertical);
+                if (totalHorizontal<=totalVertical){
+                    if (up>=down){
+                        shootx = x;
+                        shooty = y-1;
+                    }else{
+                        shootx = x;
+                        shooty = y+1;
+                    }
+                }else{
+                    if (left>=right){
+                        shootx = x-1;
+                        shooty = y;
+                    }else{
+                        shootx = x+1;
+                        shooty = y;
+                    }
+
+                } 
+                System.out.println("shoot x,y :"+(shootx+1)+","+(shooty+1));
+                if(check()){
+                    enemyMap[shootx][shooty]=-1;
+                    System.out.println("Hit!!");
+                    printEnemyMap();
+                    hunt(shootx,shooty);
+                }else{
+                    enemyMap[shootx][shooty]=-2;
+                    System.out.println("はずれ");
+                    printEnemyMap();
+                }
+                
+            }
+       return false;
+   }
         
     static void countClear(){
         for(int i=0;i<10;i++){
             for(int j=0;j<10;j++){
                 searchMap[i][j]=0;
+            }
+        }
+    }
+    static void enemyClear(){
+        for(int i=0;i<10;i++){
+            for(int j=0;j<10;j++){
+                enemyMap[i][j]=0;
             }
         }
     }
@@ -189,14 +290,18 @@ class Main {
         for(int i=0;i<index;i++){
             System.out.println("x,y : "+(posx[i]+1)+","+(posy[i]+1));//候補一覧\nアイデア募集
         }//そもそも候補が複数になることって最初以外あるの？
-        System.out.println(""+(posx[0]+1)+","+(posy[0]+1));//とりあえず最初の
+        shootx = posx[0];
+        shooty = posy[0];
+        System.out.println("shootx,y :"+(posx[0]+1)+","+(posy[0]+1));//とりあえず最初の
         if (check()){
             System.out.println("Hit!");
-            enemyMap[posx[0]][posy[0]]=-1;//あたったら-1を書き込み
+            enemyMap[shootx][shooty]=-1;//あたったら-1を書き込み
+            printEnemyMap();
             return true;
         }else{
             System.out.println("はずれ");
-            enemyMap[posx[0]][posy[0]]=-2;//外れたら-2を書き込み
+            enemyMap[shootx][shooty]=-2;//外れたら-2を書き込み
+            printEnemyMap();
             return false;
         }
     }
