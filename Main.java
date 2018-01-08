@@ -65,7 +65,12 @@ class Main {
         boolean boo = true;
         if (mode==0){
             //一回目の攻撃
-            countClear();
+            //countClear()
+	    for(int i=0;i<10;i++){
+		    for(int j=0;j<10;j++){
+			searchMap[i][j]=0;
+		    }
+	    }
             count(2);//ここなんかダサい
             count(3);
             count(3);
@@ -420,11 +425,6 @@ class Main {
     }
 
     static void countClear(){
-        for(int i=0;i<10;i++){
-            for(int j=0;j<10;j++){
-                searchMap[i][j]=0;
-            }
-        }
     }
     static void enemyClear(){
         for(int i=0;i<10;i++){
