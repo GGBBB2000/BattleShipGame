@@ -25,11 +25,13 @@ class Main {
     Fleet Destroyer = new Fleet(7,7,0,2);
     static int hp [] = {5,2,3,3,4,5};//船のIDに合わせて。index0番めは残りの船の数
     static int enemyHp[] = {5,1,2,1,1};
-
+    static int deff= 0;
     public static void main (String args[]){
         initialize();
         if (order==1){
-            deffense();
+            do{
+                deffense();
+            }while(deff==1);
         }
         while(true){
             do{
@@ -37,9 +39,11 @@ class Main {
                     return;
                 }
             }while(mode==1);//mode 0 :あたってない mode 1:撃沈してもう一度探索 mode 2:方向探索中
-            if(!deffense()){
-                return;
-            }
+            do{
+                if (!deffense()){
+                    return;
+                }
+            }while(deff==1);
         }
     }
 
@@ -85,6 +89,7 @@ class Main {
         return boo;
     }
     static boolean deffense(){
+        deff = 0;
         boolean boo = true;
         System.out.println("敵の攻撃\nスペース区切りで座標を入力\n左上は1,1");
         Scanner sc = new Scanner(System.in);
@@ -93,6 +98,7 @@ class Main {
         if (map[x][y]>0){
             int i = map[x][y];
             map[x][y]=0;
+            printMap();
             //map[x][y]*=-1;//こっちやったら書式崩れたので
             hp[i]--;
             if (hp[i]==0){
@@ -102,6 +108,7 @@ class Main {
                     System.out.println("負け");
                     boo = false;
                 }
+                deff = 1;
             }else {
                 System.out.println("Hit!!");
                 deffense();
@@ -109,7 +116,6 @@ class Main {
         }else{
             System.out.println("ハズレ");
         }
-        printMap();
         return boo;
     }
     static void put(int x,int y,int dir,int length,int shipType){
@@ -124,6 +130,25 @@ class Main {
     }
     static void printMap(){//自分のマップ表示
         System.out.println("printMap"+"\u001b[34m");
+        System.out.print("   ");
+        for(int x = 1;x < 11 ;x++)
+            System.out.print(x +"   ");
+        System.out.println("");
+        for(int i= 0;i<10;i++){
+            System.out.print(String.format("%2d",i+1));
+            for (int j=0;j<10;j++){
+                if(map[j][i] == 0){
+                    System.out.print("[  ]");
+                }else{
+                    System.out.print("["+String.format("%2d",map[j][i])+"]");
+                }
+            }
+            System.out.println("");
+        }
+        System.out.println("\u001b[0m");
+    }
+    static void printDebug(){//debug表示
+        System.out.println("printDebug"+"\u001b[32m");
         System.out.print("   ");
         for(int x = 1;x < 11 ;x++)
             System.out.print(x +"   ");
@@ -267,7 +292,7 @@ class Main {
             System.out.println("shoot x,y :"+(shootx+1)+","+(shooty+1));
             if(check()){
                 if (gktncheck()){
-                    enemyMap[shootx][shooty]=-1;
+                    enemyMap[shootx][shooty]=-3;
                     System.out.println("撃沈");
                     dir = 0;
                     printEnemyMap();
@@ -314,7 +339,7 @@ class Main {
             System.out.println("shoot x,y : "+(shootx+1)+","+(shooty+1));
             if(check()){
                 if (gktncheck()){
-                    enemyMap[shootx][shooty]=-1;
+                    enemyMap[shootx][shooty]=-3;
                     System.out.println("撃沈");
                     dir = 0;
                     printEnemyMap();
@@ -360,7 +385,7 @@ class Main {
             System.out.println("shoot x,y : "+(shootx+1)+","+(shooty+1));
             if(check()){
                 if (gktncheck()){
-                    enemyMap[shootx][shooty]=-1;
+                    enemyMap[shootx][shooty]=-3;
                     System.out.println("撃沈");
                     dir = 0;
                     printEnemyMap();
@@ -422,7 +447,7 @@ class Main {
         System.out.println("shootx,y :"+(posx[0]+1)+","+(posy[0]+1));//とりあえず最初の
         if(check()){
             if (gktncheck()){
-                enemyMap[shootx][shooty]=-1;
+                enemyMap[shootx][shooty]=-3;
                 System.out.println("撃沈");
                 dir = 0;
                 printEnemyMap();
@@ -459,11 +484,13 @@ class Main {
                 for(int j=0;j<10;j++){
                     if (enemyMap[i][j]==-1){
                         length++;
+                        enemyMap[i][j]=-3;
                     }
                 }
             }
-            if (enemyHp[length-1]>=1){
-                enemyHp[length-1]--;
+            if (length+1>=0&&enemyHp[length+1]>=1){
+                enemyHp[length+1]--;
+                System.out.println("長さ"+(length+1)+"を撃沈?");
             }
             mode=1;
             return true;
