@@ -24,18 +24,19 @@ class Main {
     Fleet Cruiser2 = new Fleet(6,6,0,3);
     Fleet Destroyer = new Fleet(7,7,0,2);
     static int hp [] = {5,2,3,3,4,5};//船のIDに合わせて。index0番めは残りの船の数
+    static int enemyHp[] = {5,1,2,1,1};
 
     public static void main (String args[]){
         initialize();
         if (order==1){
             deffense();
         }
-
         while(true){
-            if (!attack()){
-                return;
-            }
-            mode =0;
+            do{
+                if (!attack()){
+                    return;
+                }
+            }while(mode==1);//mode 0 :あたってない mode 1:撃沈してもう一度探索 mode 2:方向探索中
             if(!deffense()){
                 return;
             }
@@ -52,23 +53,31 @@ class Main {
         printMap();
     }
     static boolean attack(){
+        if (mode==1){
+            mode = 0;
+        }
         boolean boo = true;
-        //一回目の攻撃
-        countClear();
-        count(2);//ここなんかダサい
-        count(3);
-        count(3);
-        count(4);
-        count(5);
-        printSearchMap();
-        choose();
-        //enemyMap[4][4]=1;
-        right = 0;
-        left = 0;
-        up = 0;
-        down = 0;
-        totalHorizontal = 0;
-        totalVertical = 0;
+        if (mode==0){
+            //一回目の攻撃
+            countClear();
+            count(2);//ここなんかダサい
+            count(3);
+            count(3);
+            count(4);
+            count(5);
+            printSearchMap();
+            if(!choose()){
+                return true;
+            }
+            mode = 2;
+            right = 0;
+            left = 0;
+            up = 0;
+            down = 0;
+            totalHorizontal = 0;
+            totalVertical = 0;
+
+        }
 
         while(hunt(shootx,shooty)){
             System.out.println("huntcalled");
@@ -195,8 +204,9 @@ class Main {
     }
     static boolean hunt(int x,int y){
         if(dir == 0){
-            for(int i=1;i-1<maxLength;i++){
+            for(int i=1;i-1<maxLength+1;i++){
                 if(x-i>=0&&enemyMap[x-i][y]==0){
+                    //System.out.println("left "+(x-i+1)+","+(y+1));
                     left++;
                 }else if (x-i>=0&&enemyMap[x-i][y]!=0){
                     break;
@@ -204,6 +214,7 @@ class Main {
             }
             for(int i=1;i<maxLength+1;i++){
                 if(x+i<=9&&enemyMap[x+i][y]==0){
+                    //System.out.println("right "+(x+1+i)+","+(y+1));
                     right++;
                 }else if (x+i<=9&&enemyMap[x+i][y]!=0){
                     break;
@@ -211,6 +222,7 @@ class Main {
             }
             for(int i=1;i<maxLength+1;i++){
                 if(y-i>=0&&enemyMap[x][y-i]==0){
+                    //System.out.println("up "+(x+1)+","+(y-i+1));
                     up++;
                 }else if (y-i>=0&&enemyMap[x][y-i]!=0){
                     break;
@@ -218,6 +230,7 @@ class Main {
             }
             for(int i=1;i<maxLength+1;i++){
                 if(y+i<=9&&enemyMap[x][y+i]==0){
+                    //System.out.println("down "+(x+1)+","+(y+i+1));
                     down++;
                 }else if (y+i<=9&&enemyMap[x][y+i]!=0){
                     break;
@@ -253,10 +266,19 @@ class Main {
             }
             System.out.println("shoot x,y :"+(shootx+1)+","+(shooty+1));
             if(check()){
-                enemyMap[shootx][shooty]=-1;
-                System.out.println("Hit!!");
-                printEnemyMap();
-                return true;
+                if (gktncheck()){
+                    enemyMap[shootx][shooty]=-1;
+                    System.out.println("撃沈");
+                    dir = 0;
+                    printEnemyMap();
+                    return false;
+
+                }else{
+                    enemyMap[shootx][shooty]=-1;
+                    System.out.println("Hit!!");
+                    printEnemyMap();
+                    return true;
+                }
             }else{
                 enemyMap[shootx][shooty]=-2;
                 System.out.println("はずれ");
@@ -290,11 +312,19 @@ class Main {
                 } 
             }
             System.out.println("shoot x,y : "+(shootx+1)+","+(shooty+1));
-            if (check()){
-                System.out.println("Hit!");
-                enemyMap[shootx][shooty]=-1;//あたったら-1を書き込み
-                printEnemyMap();
-                return true;
+            if(check()){
+                if (gktncheck()){
+                    enemyMap[shootx][shooty]=-1;
+                    System.out.println("撃沈");
+                    dir = 0;
+                    printEnemyMap();
+                    return false;
+                }else{
+                    enemyMap[shootx][shooty]=-1;
+                    System.out.println("Hit!!");
+                    printEnemyMap();
+                    return true;
+                }
             }else{
                 System.out.println("はずれ");
                 enemyMap[shootx][shooty]=-2;//外れたら-2を書き込み
@@ -328,11 +358,19 @@ class Main {
                 } 
             }
             System.out.println("shoot x,y : "+(shootx+1)+","+(shooty+1));
-            if (check()){
-                System.out.println("Hit!");
-                enemyMap[shootx][shooty]=-1;//あたったら-1を書き込み
-                printEnemyMap();
-                return true;
+            if(check()){
+                if (gktncheck()){
+                    enemyMap[shootx][shooty]=-1;
+                    System.out.println("撃沈");
+                    dir = 0;
+                    printEnemyMap();
+                    return false;
+                }else{
+                    enemyMap[shootx][shooty]=-1;
+                    System.out.println("Hit!!");
+                    printEnemyMap();
+                    return true;
+                }
             }else{
                 System.out.println("はずれ");
                 enemyMap[shootx][shooty]=-2;//外れたら-2を書き込み
@@ -382,11 +420,20 @@ class Main {
         shootx = posx[0];
         shooty = posy[0];
         System.out.println("shootx,y :"+(posx[0]+1)+","+(posy[0]+1));//とりあえず最初の
-        if (check()){
-            System.out.println("Hit!");
-            enemyMap[shootx][shooty]=-1;//あたったら-1を書き込み
-            printEnemyMap();
-            return true;
+        if(check()){
+            if (gktncheck()){
+                enemyMap[shootx][shooty]=-1;
+                System.out.println("撃沈");
+                dir = 0;
+                printEnemyMap();
+                return false;
+
+            }else{
+                enemyMap[shootx][shooty]=-1;
+                System.out.println("Hit!!");
+                printEnemyMap();
+                return true;
+            }
         }else{
             System.out.println("はずれ");
             enemyMap[shootx][shooty]=-2;//外れたら-2を書き込み
@@ -403,4 +450,26 @@ class Main {
             return false;
         }
     }
+    static boolean gktncheck(){
+        System.out.println("撃沈なら0,そうでないなら1");
+        Scanner sc = new Scanner(System.in);
+        if (sc.nextInt()==0){
+            int length=0;
+            for(int i=0;i<10;i++){
+                for(int j=0;j<10;j++){
+                    if (enemyMap[i][j]==-1){
+                        length++;
+                    }
+                }
+            }
+            if (enemyHp[length-1]>=1){
+                enemyHp[length-1]--;
+            }
+            mode=1;
+            return true;
+        }else{
+            return false;
+        }
+    }
 }
+
