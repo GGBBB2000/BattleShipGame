@@ -1,10 +1,12 @@
 import java.util.Scanner;
 import java.util.Random;
+import java.util.InputMismatchException;
 class Main {
     static int order = 1;//先行なら0
     static int map[][] = new int [10][10];//自分のマップ
     static int enemyMap[][] = new int [10][10];//敵のマップ
     static int searchMap[][] = new int [10][10];//敵を探索するときのマップ
+    static int debugMap[][] = new int [10][10];//debugマップ
     static int mode = 0;
     static int dir = 0;//0なら探索中,1なら横,2なら縦
     static int maxLength = 5;
@@ -92,9 +94,21 @@ class Main {
         deff = 0;
         boolean boo = true;
         System.out.println("敵の攻撃\nスペース区切りで座標を入力\n左上は1,1");
-        Scanner sc = new Scanner(System.in);
-        int x = sc.nextInt()-1;
-        int y = sc.nextInt()-1;
+        int x = 0;
+        int y = 0;
+        boolean b = true;
+        do{
+            Scanner sc = new Scanner(System.in);
+            try{
+                x = sc.nextInt()-1;
+                y = sc.nextInt()-1;
+                b = true;
+            }catch (InputMismatchException e) {
+                b = false;
+                System.out.println("異なる値が代入されました");
+            }
+
+        }while(!b);
         if (map[x][y]>0){
             int i = map[x][y];
             map[x][y]=0;
@@ -467,18 +481,42 @@ class Main {
         }
     }
     static boolean check(){
-        System.out.println("あたったら0,外れたら1");
-        Scanner sc = new Scanner(System.in);
-        if (sc.nextInt()==0){
+        System.out.println("あたったら0,外れたらその他整数");
+        int s = 0;
+        boolean b = true;
+        do{
+            Scanner sc = new Scanner(System.in);
+            try{
+                s = sc.nextInt();
+                b = true;
+            }catch (InputMismatchException e) {
+                b = false;
+                System.out.println("異なる値が代入されました");
+            }
+        }while(!b);
+        if (s==0){
             return true;
         }else{
             return false;
         }
     }
     static boolean gktncheck(){
-        System.out.println("撃沈なら0,そうでないなら1");
-        Scanner sc = new Scanner(System.in);
-        if (sc.nextInt()==0){
+        System.out.println("撃沈なら0,そうでないならその他整数");
+        int s = 0;
+        boolean b = true;
+        do{
+            Scanner sc = new Scanner(System.in);
+            try{
+                s = sc.nextInt();
+                b = true;
+            }catch (InputMismatchException e) {
+                b = false;
+                System.out.println("異なる値が代入されました");
+            }
+        
+        }while(!b);
+        
+        if (s==0){
             int length=0;
             for(int i=0;i<10;i++){
                 for(int j=0;j<10;j++){
